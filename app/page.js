@@ -1,6 +1,12 @@
 "use client";
 
+import { z } from "zod";
 import { useForm } from "react-hook-form";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
 export default function Home() {
   const {
@@ -8,7 +14,7 @@ export default function Home() {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data) => {
     try {
@@ -28,30 +34,12 @@ export default function Home() {
         onSubmit={handleSubmit(onSubmit)}
         className="flex  gap-2 text-black"
       >
-        <input
-          {...register("email", {
-            required: "Email is required",
-            validate: (value) => {
-              if (!value.includes("@")) {
-                return "Email must  include @";
-              }
-              return true;
-            },
-          })}
-          type="text"
-          placeholder="Email"
-        />
+        <input {...register("email")} type="text" placeholder="Email" />
         {errors.email && (
           <div className="text-red-500">{errors.email.message}</div>
         )}
         <input
-          {...register("password", {
-            required: "Password is required",
-            minLength: {
-              value: 8,
-              message: "Password must have at least 8 characters ",
-            },
-          })}
+          {...register("password")}
           type="password"
           placeholder="Password"
         />
